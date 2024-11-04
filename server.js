@@ -10,27 +10,25 @@ Cyclic Web App URL: _______________________________________________________
 GitHub Repository URL: ______________________________________________________
 
 ********************************************************************************/ 
-
 const express = require("express");
 const path = require("path");
 const storeService = require("./store-service"); 
 
 const app = express();
-const PORT = 8080;
+const PORT = process.env.PORT || 8080; // Use environment PORT
 
+// Serve static files from the 'public' directory
+app.use(express.static(path.join(__dirname, 'public')));
 
 storeService.initialize()
     .then(() => {
-        
         app.listen(PORT, () => {
             console.log(`Server is running on http://localhost:${PORT}`);
         });
     })
     .catch((err) => {
-        
         console.error("Unable to start the server. Error: ", err);
     });
-
 
 app.get("/shop", (req, res) => {
     storeService.getPublishedItems()
@@ -41,7 +39,6 @@ app.get("/shop", (req, res) => {
             res.status(500).json({ message: err }); 
         });
 });
-
 
 app.get("/items", (req, res) => {
     storeService.getAllItems()
@@ -63,7 +60,13 @@ app.get("/categories", (req, res) => {
         });
 });
 
-
+// 404 Not Found Handler
 app.use((req, res) => {
     res.status(404).json({ message: "Page Not Found" }); 
+});
+
+// Error Handling Middleware
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).json({ message: "Internal Server Error" });
 });
