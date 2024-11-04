@@ -1,65 +1,69 @@
-
-
-const fs = require("fs").promises; // Use promises with fs for async file operations
-const path = require("path"); // For handling file paths
-
+const fs = require("fs");
+const path = require("path");
 
 let items = [];
 let categories = [];
 
-
 function initialize() {
     return new Promise((resolve, reject) => {
-        // Read items.json
-        fs.readFile(path.join(__dirname, 'data', 'items.json'), 'utf-8')
-            .then(data => {
-                items = JSON.parse(data); 
-                return fs.readFile(path.join(__dirname, 'data', 'categories.json'), 'utf-8'); 
-            })
-            .then(data => {
-                categories = JSON.parse(data); 
-                resolve(); 
-            })
-            .catch(error => {
-                reject("Unable to read file: " + error.message); 
+        const itemsFilePath = path.join(__dirname, "data", "items.json");
+        const categoriesFilePath = path.join(__dirname, "data", "categories.json");
+
+        fs.readFile(itemsFilePath, "utf8", (err, data) => {
+            if (err) {
+                return reject(`Unable to read items.json: ${err.message}`);  
+            }
+            try {
+                items = JSON.parse(data);
+            } catch (e) {
+                return reject(`Error parsing items.json: ${e.message}`);  
+            }
+
+            fs.readFile(categoriesFilePath, "utf8", (err, data) => {
+                if (err) {
+                    return reject(`Unable to read categories.json: ${err.message}`);  
+                }
+                try {
+                    categories = JSON.parse(data);
+                    resolve();  
+                } catch (e) {
+                    return reject(`Error parsing categories.json: ${e.message}`);  
+                }
             });
+        });
     });
 }
-
 
 function getAllItems() {
     return new Promise((resolve, reject) => {
         if (items.length > 0) {
-            resolve(items); 
+            resolve(items);
         } else {
-            reject("No results returned"); 
+            reject("No results returned");
         }
     });
 }
-
 
 function getPublishedItems() {
     return new Promise((resolve, reject) => {
-        const publishedItems = items.filter(item => item.published); 
+        const publishedItems = items.filter(item => item.published === true);
         if (publishedItems.length > 0) {
-            resolve(publishedItems); 
+            resolve(publishedItems);
         } else {
-            reject("No results returned"); 
+            reject("No results returned");
         }
     });
 }
-
 
 function getCategories() {
     return new Promise((resolve, reject) => {
         if (categories.length > 0) {
-            resolve(categories); 
+            resolve(categories);
         } else {
-            reject("No results returned"); 
+            reject("No results returned");
         }
     });
 }
-
     
 module.exports = {
     initialize,

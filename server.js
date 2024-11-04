@@ -11,63 +11,49 @@ GitHub Repository URL: ______________________________________________________
 
 ********************************************************************************/ 
 const express = require("express");
-const path = require("path");
-const storeService = require("./store-service"); 
-
 const app = express();
-const PORT = process.env.PORT || 8080; // Use environment PORT
+const path = require("path");
+const storeService = require("./store-service");
 
-app.set('views', __dirname + '/views');
-// Serve static files from the 'public' directory
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static("public"));
 
-storeService.initialize()
-    .then(() => {
-        app.listen(PORT, () => {
-            console.log(`Server is running on http://localhost:${PORT}`);
-        });
-    })
-    .catch((err) => {
-        console.error("Unable to start the server. Error: ", err);
+app.get("/", (req, res) => {
+    res.redirect("/about");
+});
+
+app.get("/about", (req, res) => {
+    res.sendFile(path.join(__dirname, "views", "about.html"));
+});
+
+storeService.initialize().then(() => {
+
+    app.get("/shop", (req, res) => {
+        storeService.getPublishedItems()
+            .then(data => res.json(data))
+            .catch(err => res.status(500).json({ message: err }));
     });
 
-app.get("/shop", (req, res) => {
-    storeService.getPublishedItems()
-        .then((data) => {
-            res.json(data); 
-        })
-        .catch((err) => {
-            res.status(500).json({ message: err }); 
-        });
-});
+    app.get("/items", (req, res) => {
+        storeService.getAllItems()
+            .then(data => res.json(data))
+            .catch(err => res.status(500).json({ message: err }));
+    });
 
-app.get("/items", (req, res) => {
-    storeService.getAllItems()
-        .then((data) => {
-            res.json(data); 
-        })
-        .catch((err) => {
-            res.status(500).json({ message: err }); 
-        });
-});
+    app.get("/categories", (req, res) => {
+        storeService.getCategories()
+            .then(data => res.json(data))
+            .catch(err => res.status(500).json({ message: err }));
+    });
 
-app.get("/categories", (req, res) => {
-    storeService.getCategories()
-        .then((data) => {
-            res.json(data); 
-        })
-        .catch((err) => {
-            res.status(500).json({ message: err }); 
-        });
-});
+    app.use((req, res) => {
+        res.status(404).send("Page Not Found");
+    });
 
-// 404 Not Found Handler
-app.use((req, res) => {
-    res.status(404).json({ message: "Page Not Found" }); 
-});
+    const PORT = process.env.PORT || 3000;
+    app.listen(PORT, () => {
+        console.log(`Express http server listening on port ${PORT}`);
+    });
 
-// Error Handling Middleware
-app.use((err, req, res, next) => {
-    console.error(err.stack);
-    res.status(500).json({ message: "Internal Server Error" });
+}).catch(err => {
+    console.error(`Could not open file: ${err}`);
 });
