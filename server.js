@@ -17,6 +17,7 @@ const storeService = require("./store-service");
 const app = express();
 const PORT = process.env.PORT || 8080; // Use environment PORT
 
+app.set('views', __dirname + '/views');
 // Serve static files from the 'public' directory
 app.use(express.static(path.join(__dirname, 'public')));
 
