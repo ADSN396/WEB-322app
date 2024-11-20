@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shop</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="#">WEB322 - Adson Davis</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+                <li class="nav-item"><a class="nav-link" href="/about">About</a></li>
+                <li class="nav-item"><a class="nav-link" href="/items">Items</a></li>
+                <li class="nav-item"><a class="nav-link" href="/categories">Categories</a></li>
+                <li class="nav-item"><a class="nav-link" href="/items/add">Add Item</a></li>
+                <li class="nav-item"><a class="nav-link" href="/shop">Shop</a></li>
+                <li class="nav-item"><a class="nav-link" href="/register">Register</a></li>
+                <li class="nav-item"><a class="nav-link" href="/login">Login</a></li>
+                 <% if (typeof user !== 'undefined' && user) { %>
+                    <li class="nav-item"><a class="nav-link" href="/logout">Logout (<%= user.username %>)</a></li>
+                <% } %>
+                
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-md-9">
+                <% if (data.post) { %>
+                    <article>
+                        <h2><%= data.post.title %></h2>
+                        <img src="<%= data.post.featureImage %>" alt="<%= data.post.title %>" class="img-fluid">
+                        <br /><br />
+                        <%- data.post.body %>
+                        <br /><br />
+                        <p><strong>Category:</strong> <%= data.post.category %></p>
+                        <p><strong>Price:</strong> <%= data.post.price %></p>
+                        <p><strong>Last Updated:</strong> <%= data.post.postDate %></p>
+                    </article>
+                <% } else { %>
+                    <div class="col-md-12 text-center">
+                        <h2><%= data.message %></h2>
+                        <p>Please try another Post / Category</p>
+                    </div>
+                <% } %>
+            </div>
+            <div class="col-md-3">
+                <% if (data.items) { %>
+                    <h4>Items</h4>
+                    <ul>
+                        <% data.items.forEach(function(item) { %>
+                            <li><a href="/shop/<%= item.id %>"><%= item.title %></a></li>
+                        <% }); %>
+                    </ul>
+                    
+                <% } %>
+
+                <% if (data.categories) { %>
+                    <h4>Categories</h4>
+                    <ul>
+                        <% data.categories.forEach(function(category) { %>
+                            <li><a href="/shop?category=<%= category.id %>"><%= category.category %></a></li>
+                        <% }); %>
+                    </ul>
+                <% } %>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
